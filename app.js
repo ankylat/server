@@ -82,12 +82,22 @@ schedule.scheduleJob("*/5 * * * *", closeMintingWindowForAnkys);
 // checkAndUpdateGeneratedAnkys();
 // closeVotingWindowAndOpenMint();
 
+const shuffleArray = (array) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    // Generate a random index from 0 to i
+    const j = Math.floor(Math.random() * (i + 1));
+    // Swap elements at indices i and j
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+};
+
 app.get("/ankywriters", async (req, res) => {
   try {
     const ankyWriters = await prisma.ankyWriter.findMany({
       where: {},
-    }); // Fetch all AnkyWriter entries
-    res.render("ankywriters", { ankyWriters }); // Pass the entries to your EJS template
+    });
+    shuffleArray(ankyWriters);
+    res.status(200).json({ ankyWriters: ankyWriters });
   } catch (error) {
     console.error("Error fetching AnkyWriters:", error);
     res.status(500).send("Server error");
