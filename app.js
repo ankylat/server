@@ -87,7 +87,6 @@ app.get("/ankywriters", async (req, res) => {
     const ankyWriters = await prisma.ankyWriter.findMany({
       where: {},
     }); // Fetch all AnkyWriter entries
-    console.log(ankyWriters);
     res.render("ankywriters", { ankyWriters }); // Pass the entries to your EJS template
   } catch (error) {
     console.error("Error fetching AnkyWriters:", error);
