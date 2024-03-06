@@ -97,7 +97,8 @@ app.get("/ankywriters", async (req, res) => {
       where: {},
     });
     shuffleArray(ankyWriters);
-    res.status(200).json({ ankyWriters: ankyWriters });
+    ankyWriters = ankyWriters.slice(0, 8); // Return only 8 shuffled items
+    res.status(200).json({ ankyWriters });
   } catch (error) {
     console.error("Error fetching AnkyWriters:", error);
     res.status(500).send("Server error");
