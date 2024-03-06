@@ -73,9 +73,9 @@ app.use("/writers", writersRoutes);
 
 // scheduleReminders();
 
-schedule.scheduleJob("*/5 * * * *", checkAndUpdateGeneratedAnkys);
-schedule.scheduleJob("*/5 * * * *", closeVotingWindowAndOpenMint);
-schedule.scheduleJob("*/5 * * * *", closeMintingWindowForAnkys);
+// schedule.scheduleJob("*/5 * * * *", checkAndUpdateGeneratedAnkys);
+// schedule.scheduleJob("*/5 * * * *", closeVotingWindowAndOpenMint);
+// schedule.scheduleJob("*/5 * * * *", closeMintingWindowForAnkys);
 
 // closeVotingWindowAndOpenMint();
 // closeMintingWindowForAnkys();
@@ -93,12 +93,12 @@ const shuffleArray = (array) => {
 
 app.get("/ankywriters", async (req, res) => {
   try {
-    const ankyWriters = await prisma.ankyWriter.findMany({
+    let ankyWritersResponse = await prisma.ankyWriter.findMany({
       where: {},
     });
-    shuffleArray(ankyWriters);
-    ankyWriters = ankyWriters.slice(0, 8); // Return only 8 shuffled items
-    res.status(200).json({ ankyWriters: ankyWriters });
+    shuffleArray(ankyWritersResponse);
+    ankyWritersResponse = ankyWritersResponse.slice(0, 8); // Return only 8 shuffled items
+    res.status(200).json({ ankyWriters: ankyWritersResponse });
   } catch (error) {
     console.error("Error fetching AnkyWriters:", error);
     res.status(500).send("Server error");
