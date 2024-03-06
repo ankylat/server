@@ -73,9 +73,9 @@ app.use("/writers", writersRoutes);
 
 // scheduleReminders();
 
-// schedule.scheduleJob("*/5 * * * *", checkAndUpdateGeneratedAnkys);
-// schedule.scheduleJob("*/5 * * * *", closeVotingWindowAndOpenMint);
-// schedule.scheduleJob("*/5 * * * *", closeMintingWindowForAnkys);
+schedule.scheduleJob("*/5 * * * *", checkAndUpdateGeneratedAnkys);
+schedule.scheduleJob("*/5 * * * *", closeVotingWindowAndOpenMint);
+schedule.scheduleJob("*/5 * * * *", closeMintingWindowForAnkys);
 
 // closeVotingWindowAndOpenMint();
 // closeMintingWindowForAnkys();
@@ -133,6 +133,28 @@ app.post("/signData", async (req, res) => {
   const signatureData = Buffer.from(body.signatureData, "hex");
   const signature = await signDataOnServer(signatureData);
   res.status(200).json({ signature: signature.toString("hex") });
+});
+
+function isValidEmail(email) {
+  const regex =
+    /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@(([^<>()[\]\\.,;:\s@"]+\.)+[^<>()[\]\\.,;:\s@"]{2,})$/i;
+  return regex.test(email);
+}
+
+app.post("/add-email", async (req, res) => {
+  try {
+    const validEmail = isValidEmail(req.body.email);
+    if (validEmail) {
+      const emailRecord = await prisma.email.create({
+        data: {
+          email: validEmail,
+        },
+      });
+      return res.status(200).json({ message: "that is a valid email" });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "that email is invalid" });
+  }
 });
 
 app.post("/upload-writing", async (req, res) => {

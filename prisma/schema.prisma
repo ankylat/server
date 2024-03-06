@@ -179,6 +179,8 @@ model AnkyWriter {
     imagePrompt   String?
     index       Int
     story String?
+    description String?
+    newName     String?
     kingdom   String
     city      String
     chakra    Int
