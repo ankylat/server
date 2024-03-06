@@ -104,52 +104,6 @@ app.get("/ankywriters", async (req, res) => {
   }
 });
 
-app.post("/vote-for-anky", async (req, res) => {
-  const { ankyWriterId, imageKey } = req.body; // Destructure the ankyWriterId and imageKey from the request body
-
-  try {
-    console.log("voting for this anky", ankyWriterId, imageKey);
-
-    // Use Prisma to update the AnkyWriter entry with the votedImage
-    const updatedAnkyWriter = await prisma.ankyWriter.update({
-      where: { id: parseInt(ankyWriterId) },
-      data: {
-        votedImage: imageKey, // Update the votedImage field with the imageKey
-      },
-    });
-    console.log("vote recorded");
-    // Respond with success message
-    res.json({ success: true, message: "Vote recorded!", updatedAnkyWriter });
-  } catch (error) {
-    console.error("Error recording vote:", error);
-    res.status(500).json({ success: false, message: "Error recording vote" });
-  }
-});
-
-app.post("/flag-anky", async (req, res) => {
-  const { ankyWriterId } = req.body;
-
-  try {
-    const updatedAnkyWriter = await prisma.ankyWriter.update({
-      where: { id: parseInt(ankyWriterId) },
-      data: {
-        flagged: true, // Set the flagged attribute to true
-      },
-    });
-
-    res.json({
-      success: true,
-      message: "AnkyWriter flagged successfully",
-      updatedAnkyWriter,
-    });
-  } catch (error) {
-    console.error("Error flagging AnkyWriter:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Error flagging AnkyWriter" });
-  }
-});
-
 app.get("/", (req, res) => {
   res.send("Welcome to Anky Backend!");
 });

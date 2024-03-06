@@ -190,6 +190,7 @@ model AnkyWriter {
     imageThreeUrl    String?
     imageFourUrl     String?
     votedImage       String?
+    uploadedImage    String?
     flagged          Boolean?
     createdAt         DateTime @default(now())
 }
