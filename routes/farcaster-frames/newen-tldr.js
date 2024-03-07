@@ -51,7 +51,7 @@ router.post("/", async (req, res) => {
             <meta name="fc:frame:button:1" content="keep me posted">
             <meta name="fc:frame:button:2" content="know the anky writers">
             <meta name="fc:frame:button:2:action" content="link">   
-            <meta name="fc:frame:button:2:target" content="https://api.anky.lat/ankywriters">   
+            <meta name="fc:frame:button:2:target" content="https://www.anky.lat/anky-writers">   
             </head>
           </html>
             `);
