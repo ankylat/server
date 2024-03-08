@@ -184,6 +184,7 @@ model AnkyWriter {
     kingdom   String
     city      String
     chakra    Int
+    letterToWriter        String?
     imagineApiStatus  String?
     imagineApiID   String?
     frameImageUrl    String?
