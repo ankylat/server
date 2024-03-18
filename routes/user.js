@@ -152,41 +152,26 @@ router.get("/farcaster/:privyId", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    const { privyId } = req.body; // Ensure you are receiving the correct fields from the frontend
+    const { privyId } = req.body;
 
     const privyUser = await privy.getUser(`did:privy:${privyId}`);
     if (!privyUser)
       return res.status(500).json({ message: "You are not authorized here" });
 
-    let user = await prisma.user.findUnique({
+    let user = await prisma.newUser.findUnique({
       where: { privyId },
-      include: {
-        farcasterAccount: {
-          select: {
-            id: true,
-            username: true,
-            displayName: true,
-            bio: true,
-            pfp: true,
-            signerStatus: true,
-            fid: true,
-            // signerUuid: false, // Not needed, omitted fields are excluded by default
-            // publicKey: false, // Not needed, omitted fields are excluded by default
-          },
-        },
-      },
     });
 
     if (!user) {
       // If not, create a new user
-      user = await prisma.user.create({
+      user = await prisma.newUser.create({
         data: {
           privyId,
         },
       });
     } else {
       // If yes, update the last login time
-      user = await prisma.user.update({
+      user = await prisma.newUser.update({
         where: { privyId },
         data: {
           lastLogin: new Date(),
@@ -205,86 +190,11 @@ router.post("/login", async (req, res) => {
 
 router.post("/:privyId", checkIfLoggedInMiddleware, async (req, res) => {
   try {
-    let existingFarcasterAccount;
     const privyId = req.params.privyId;
-    const { thisFarcasterAccount } = req.body;
-    const user = await prisma.user.findUnique({
+    const user = await prisma.newUser.findUnique({
       where: { privyId },
-      include: { farcasterAccount: true },
     });
-    if (thisFarcasterAccount) {
-      const {
-        signer_uuid,
-        status,
-        public_key,
-        fid,
-        pfp,
-        username,
-        displayName,
-      } = thisFarcasterAccount;
-      const bio = thisFarcasterAccount?.bio?.text || "";
-
-      existingFarcasterAccount = await prisma.farcasterAccount.findUnique({
-        where: { userId: privyId },
-      });
-
-      if (existingFarcasterAccount && fid) {
-        await prisma.farcasterAccount.update({
-          where: { id: existingFarcasterAccount.id },
-          data: {
-            signerUuid: signer_uuid,
-            publicKey: public_key,
-            signerStatus: status,
-            fid: fid,
-            bio,
-            pfp,
-            username,
-            displayName,
-          },
-        });
-        updatedUser = await prisma.user.update({
-          where: { privyId },
-          data: {
-            farcasterFID: fid || 0,
-          },
-        });
-      } else {
-        let newUser;
-        if (!user) {
-          newUser = await prisma.user.create({
-            data: {
-              privyId,
-            },
-          });
-        }
-        if (fid) {
-          await prisma.farcasterAccount.create({
-            data: {
-              user: { connect: { privyId: privyId } },
-              publicKey: public_key,
-              signerUuid: signer_uuid,
-              signerStatus: status,
-              fid: fid || 0,
-              bio,
-              pfp,
-              username,
-            },
-          });
-          updatedUser = await prisma.user.update({
-            where: { privyId },
-            data: {
-              farcasterFID: fid || 0,
-            },
-          });
-        }
-      }
-    } else {
-      if (user.farcasterAccount) {
-        existingFarcasterAccount = user.farcasterAccount;
-      }
-    }
-
-    res.json({ user, farcasterAccount: existingFarcasterAccount });
+    res.json({ user });
   } catch (error) {
     console.log("there was an error", error);
   }

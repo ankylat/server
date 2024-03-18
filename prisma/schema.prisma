@@ -19,13 +19,47 @@ model User {
   manaBalance                   Int               @default(0)
   totalManaEarned               Int               @default(0)
   farcasterFID                  Int?              @unique
-  ANKYBalance                   Int               @default(0) // Assuming smallest unit, like wei for Ethereum
+  ANKYBalance                   Int               @default(0) 
   Mana                          Mana[]
   ManaTransaction               ManaTransaction[]
   farcasterAccount              FarcasterAccount? // Relation to Farcaster account
   farcasterNotificationsEnabled Boolean           @default(false)
   lastNotified                  DateTime?
 }
+
+model NewUser {
+    privyId                       String            @id
+    createdAt                     DateTime          @default(now())
+    lastLogin                     DateTime?
+    streak                        Int               @default(0)
+    longestStreak                 Int?              @default(0)
+    writingSessions               NewWritingSession[]
+    manaBalance                   Int               @default(0)
+    totalManaEarned               Int               @default(0)
+    ANKYBalance                   Int               @default(0)
+    NewMana                          NewMana[]
+    NewManaTransaction               NewManaTransaction[]
+    lastNotified                  DateTime?
+}
+
+model NewMana {
+  id       Int      @id @default(autoincrement())
+  user     NewUser     @relation(fields: [userId], references: [privyId])
+  userId   String
+  amount   Int
+  earnedAt DateTime @default(now())
+}
+
+model NewManaTransaction {
+  id        Int      @id @default(autoincrement())
+  user      NewUser     @relation(fields: [userId], references: [privyId])
+  userId    String
+  amount    Int
+  type      String // "earned" or "spent"
+  createdAt DateTime @default(now())
+  cid       String?
+}
+
 
 model FarcasterAccount {
   id           String  @id @default(uuid())
@@ -79,6 +113,17 @@ model WritingSession {
   writingCID          String?
   uploadedToFarcaster Boolean  @default(false)
   farcasterHash       String?
+}
+
+model NewWritingSession {
+  id                  String   @id @default(uuid())
+  user                NewUser     @relation(fields: [userId], references: [privyId])
+  userId              String
+  startTime           DateTime
+  endTime             DateTime
+  manaEarned          Float
+  multiplier          Float    @default(1.0)
+  writingCID          String?
 }
 
 model CastWrapper {
